@@ -1,0 +1,73 @@
+import collections
+import argparse
+import sys
+import math
+import unicodedata
+from curses.ascii import isprint
+from argparse import RawTextHelpFormatter
+import os
+
+def main():
+    parser = argparse.ArgumentParser(description='Count unique characters from a file or stdin.',
+                                     formatter_class=RawTextHelpFormatter)
+    parser.add_argument('input', default=sys.stdin, nargs='?', type=argparse.FileType('r'),
+                        help='file with characters')
+    parser.add_argument('-t', '--task', dest='task', choices=['print', 'sum', 'count', 'entropy'], default='print',
+                        help='\n'.join([
+                            'print   = print characters with number of occurrences (default)',
+                            'sum     = sum up the number of characters',
+                            'count   = count the number of unique characters',
+                            'entropy = calculate entropy for binary representation of one char']))
+
+    parser.add_argument('-i', '--ignore-last-newline', dest='ignore_nl', action='store_true',
+                        help='ignore newline at the end of file')
+    parser.add_argument('-p', '--printable', dest='printable', action='store_true',
+                        help='ignore non-printable characters')
+    
+    # New argument for specifying the directory
+    parser.add_argument('-d', '--directory', dest='directory', default='Users/jennacasey/Desktop/label_accent/Data/Western',
+                        help='directory containing txt files (default: Users/jennacasey/Desktop/label_accent/Data/Western)')
+
+    args = parser.parse_args()
+
+    # Check if the specified directory exists
+    if not os.path.exists(args.directory):
+        print(f"Error: Directory '{args.directory}' not found.")
+        sys.exit(1)
+
+    # Create a Counter to store the character counts across all files
+    total_counter = collections.Counter()
+
+    # Iterate through each txt file in the specified directory
+    for filename in os.listdir(args.directory):
+        if filename.endswith(".txt"):
+            file_path = os.path.join(args.directory, filename)
+
+            with open(file_path, 'r') as file:
+                text = file.read()
+
+                if args.printable:
+                    text = ''.join(char for char in text if isprint(char))
+
+                if args.ignore_nl:
+                    text = text.strip('\n')
+
+                d = collections.Counter(text)
+
+                # Update the total_counter with counts from the current file
+                total_counter.update(d)
+
+    if args.task == 'sum':
+        print(sum(total_counter.values()))
+    elif args.task == 'count':
+        print(len(total_counter))
+    elif args.task == 'entropy':
+        print(H(total_counter))
+    elif args.task == 'print':
+        for c in sorted(total_counter, key=total_counter.get, reverse=True):
+            print(f"{c}|U+{ord(c):04X}|{unicodedata.name(c, 0)}|{total_counter[c]}")
+    else:
+        raise Exception('should not be reached')
+
+if __name__ == '__main__':
+    main()
