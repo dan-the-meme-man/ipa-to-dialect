@@ -9,11 +9,11 @@ from sklearn.metrics import classification_report
 if not os.path.exists('models'):
     os.mkdir('models')
 
-epochs = 1 # probably make big - small dataset, cautious of overfitting
+epochs = 200 # probably make big - small dataset, cautious of overfitting
 batch_size = 1 # probably leave as 1 - small dataset
-learning_rate = 0.001 # just have to experiment
+learning_rate = 0.01 # just have to experiment
 weight_decay = 0.001 # prevents overfitting
-dim = 32 # just have to experiment
+dim = 128 # just have to experiment
 max_length = 275
 criterion = torch.nn.CrossEntropyLoss()
 
