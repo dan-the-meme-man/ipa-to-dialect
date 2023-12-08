@@ -9,11 +9,11 @@ from sklearn.metrics import classification_report
 if not os.path.exists('models'):
     os.mkdir('models')
 
-epochs = 200 # probably make big - small dataset, cautious of overfitting
+epochs = 10 # probably make big - small dataset, cautious of overfitting
 batch_size = 1 # probably leave as 1 - small dataset
-learning_rate = 0.01 # just have to experiment
-weight_decay = 0.001 # prevents overfitting
-dim = 128 # just have to experiment
+learning_rate = 0.001 # just have to experiment
+weight_decay = 0.0001 # prevents overfitting
+dim = 32 # just have to experiment
 max_length = 275
 criterion = torch.nn.CrossEntropyLoss()
 
@@ -81,7 +81,7 @@ for e in range(epochs):
         
         # log message
         print(f'Batch {i+1:3}/{num_batches}: loss {loss.item():.4f}')
-        
+
     # dev set evaluation
     model.eval()
     preds = []
@@ -105,11 +105,13 @@ for e in range(epochs):
         label = [train_item[1] for train_item in train_items][0]
         labels.append(label)
         
-        # predicted class  
+        # predicted class
         pred = torch.argmax(model(encoded_texts)[0]).item()
         preds.append(pred)
-    
-with open(os.path.join('models', f'model_{epochs}_{batch_size}_{learning_rate}_{weight_decay}_{dim}.txt'), 'w+') as f:
-    f.write(classification_report(labels, preds))
+        
+        print(pred, label)
+        
+    with open(os.path.join('models', f'model_{epochs}_{batch_size}_{learning_rate}_{weight_decay}_{dim}_val.txt'), 'a+') as f:
+        f.write(classification_report(labels, preds))
         
 torch.save(model, os.path.join('models', f'model_{epochs}_{batch_size}_{learning_rate}_{weight_decay}_{dim}.pt'))
