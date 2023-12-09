@@ -17,7 +17,10 @@ test_data = json.load(open(os.path.join('splits', 'test.json')))
 models = os.listdir('models')
 for model_name in models:
     
-    model = torch.load(os.path.join('models', model_name))
+    if model_name.endswith('.pt'):
+        model = torch.load(os.path.join('models', model_name))
+    else:
+        continue
 
     # test set evaluation
     model.eval()

@@ -31,7 +31,7 @@ optimizer = torch.optim.Adam(
 )
 
 #print(model(torch.rand(1, 100, 64)).shape)
-#print(model)
+print(model)
 
 train_data = json.load(open(os.path.join('splits', 'train.json')))
 val_data = json.load(open(os.path.join('splits', 'val.json')))
@@ -89,9 +89,9 @@ for e in range(epochs):
     for j in range(len(val_data)):
         
         # preprocess data
-        train_item = val_data[j:j+1]
+        val_items = val_data[j:j+1]
         
-        texts = [list(train_item[0].replace(' ', '')) for train_item in train_items]
+        texts = [list(val_item[0].replace(' ', '')) for val_item in val_items]
         
         encoded_texts = [[int(vocab[c]) for c in text] for text in texts]
         
@@ -102,16 +102,15 @@ for e in range(epochs):
         encoded_texts = torch.tensor(encoded_texts)
         
         # true class
-        label = [train_item[1] for train_item in train_items][0]
+        label = [val_item[1] for val_item in val_items][0]
         labels.append(label)
         
         # predicted class
         pred = torch.argmax(model(encoded_texts)[0]).item()
         preds.append(pred)
         
-        print(pred, label)
-        
     with open(os.path.join('models', f'model_{epochs}_{batch_size}_{learning_rate}_{weight_decay}_{dim}_val.txt'), 'a+') as f:
         f.write(classification_report(labels, preds))
+        f.write('\n')
         
 torch.save(model, os.path.join('models', f'model_{epochs}_{batch_size}_{learning_rate}_{weight_decay}_{dim}.pt'))
