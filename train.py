@@ -9,11 +9,14 @@ from sklearn.metrics import classification_report
 if not os.path.exists('models'):
     os.mkdir('models')
 
+############## ADJUST THESE ####################
 epochs = 10 # probably make big - small dataset, cautious of overfitting
+learning_rate = 0.001 # just have to experiment - if loss decreasing slowly, increase learning rate
+weight_decay = 0.0001 # prevents overfitting - if training loss goes to 0, but dev set is bad, increase weight decay
+
+################ PROBABlY GOOD ####################
+dim = 32 # probably plenty, but make bigger if not learning
 batch_size = 1 # probably leave as 1 - small dataset
-learning_rate = 0.001 # just have to experiment
-weight_decay = 0.0001 # prevents overfitting
-dim = 32 # just have to experiment
 max_length = 275
 criterion = torch.nn.CrossEntropyLoss()
 
